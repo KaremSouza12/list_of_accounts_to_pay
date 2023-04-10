@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pay_count/models/accounts.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
+import 'package:pay_count/service/utils_service.dart';
 import 'package:pay_count/widgets/accounts_tile_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -17,17 +18,12 @@ class _ListAccountsState extends State<ListAccounts> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController dueDateController = TextEditingController();
   final List<Account> account = [];
-
-  Future<void> getAccounts() async {
-    setState(() {});
-  }
+  final UtilsServices utilsServices = UtilsServices();
 
   @override
   void initState() {
     super.initState();
     WidgetsFlutterBinding.ensureInitialized();
-
-    getAccounts();
   }
 
   Future<void> _showForm(
@@ -40,16 +36,60 @@ class _ListAccountsState extends State<ListAccounts> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text('Deseja cadastrar outra conta'),
-          content: Column(
-            children: [
-              TextField(
-                controller: titleController,
+          title: const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Cadastrar conta',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-              TextField(
-                controller: dueDateController,
-              ),
-            ],
+            ),
+          ),
+          content: SizedBox(
+            height: 160,
+            width: 160,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 30),
+                  child: TextFormField(
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.list),
+                      hintText: 'Título da conta',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
+                  ),
+                ),
+                TextFormField(
+                  controller: dueDateController,
+                  decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.date_range),
+                    hintText: 'Data de vencimento',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                  ),
+                  onTap: () async {
+                    DateTime? date = DateTime(1900);
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    date = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2100));
+
+                    dueDateController.text =
+                        utilsServices.formatDateTime(date!);
+                    print(dueDateController);
+                  },
+                )
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -71,6 +111,7 @@ class _ListAccountsState extends State<ListAccounts> {
                 final data = Account(
                   title: titleController.text,
                   dueDate: dueDateController.text,
+                  status: false,
                 );
 
                 accountsRepository.createData(data);
@@ -100,6 +141,7 @@ class _ListAccountsState extends State<ListAccounts> {
               itemCount: accounts.accounts.length,
               itemBuilder: (_, index) {
                 final c = accounts.accounts[index];
+                print('DATA:$c');
                 return AccountsTileWidget(account: c);
               },
             ),

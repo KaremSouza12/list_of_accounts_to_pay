@@ -19,13 +19,16 @@ class AccountsRepository extends ChangeNotifier {
 
   _getAccount() async {
     db = await DB.instance.database;
-    final List<Map<String, dynamic>> data = await db.query('accounts');
+    final List<Map<String, dynamic>> data = await db.query(
+      'accounts',
+    );
     _accounts = List.generate(
       data.length,
       (i) {
         return Account(
           title: data[i]['title'],
           dueDate: data[i]['dueDate'],
+          status: data[i]['status'] == 1,
         );
       },
     );
@@ -34,11 +37,19 @@ class AccountsRepository extends ChangeNotifier {
 
   createData(Account account) async {
     db = await DB.instance.database;
-    db.insert(
+    final id = db.insert(
       'accounts',
       account.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    _getAccount();
+    notifyListeners();
+    return id;
+  }
+
+  deleteAll() async {
+    db = await DB.instance.database;
+    await db.execute("DROP TABLE IF EXISTS accounts");
     _getAccount();
     notifyListeners();
   }

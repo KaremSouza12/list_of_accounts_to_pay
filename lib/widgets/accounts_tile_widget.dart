@@ -14,12 +14,23 @@ class AccountsTileWidget extends StatefulWidget {
 }
 
 class _AccountsTileWidgetState extends State<AccountsTileWidget> {
+  bool? isChecked = false;
+
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
       child: ListTile(
+        leading: Checkbox(
+          activeColor: Colors.green,
+          value: isChecked,
+          onChanged: (bool? value) {
+            setState(() {
+              isChecked = value;
+            });
+          },
+        ),
         title: Text(widget.account.title),
         subtitle: Text(widget.account.dueDate),
         trailing: const SizedBox(
@@ -33,11 +44,8 @@ class _AccountsTileWidgetState extends State<AccountsTileWidget> {
 
 class _CheckPaymantWidget extends StatefulWidget {
   const _CheckPaymantWidget({
-    this.isChecked = false,
     super.key,
   });
-
-  final bool? isChecked;
 
   @override
   State<_CheckPaymantWidget> createState() => __CheckPaymantWidgetState();
@@ -60,7 +68,6 @@ class __CheckPaymantWidgetState extends State<_CheckPaymantWidget> {
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Checkbox(value: widget.isChecked, onChanged: (bool? value) {}),
           IconButton(onPressed: () {}, icon: const Icon(Icons.delete)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.update))
         ],

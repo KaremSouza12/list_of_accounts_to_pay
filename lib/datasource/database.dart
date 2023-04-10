@@ -28,10 +28,11 @@ class DB {
   }
 
   _onCreate(db, version) {
-    return db.execute(
-      DatabaseScripts.createAccountsTable(),
-    );
+    return db.execute(_account);
   }
+
+  String get _account =>
+      '''CREATE TABLE accounts (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, dueDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, status INTEGER NOT NULL)''';
 
   // static Future<void> insertAccounts(Account account) async {
   //   try {
