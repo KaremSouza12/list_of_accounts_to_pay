@@ -3,6 +3,7 @@ import 'package:pay_count/models/accounts.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
 import 'package:pay_count/service/utils_service.dart';
 import 'package:pay_count/widgets/accounts_tile_widget.dart';
+import 'package:pay_count/widgets/alert_dialog_fome.dart';
 import 'package:provider/provider.dart';
 
 class ListAccounts extends StatefulWidget {
@@ -17,7 +18,6 @@ class ListAccounts extends StatefulWidget {
 class _ListAccountsState extends State<ListAccounts> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController dueDateController = TextEditingController();
-  final List<Account> account = [];
   final UtilsServices utilsServices = UtilsServices();
 
   @override
@@ -31,94 +31,10 @@ class _ListAccountsState extends State<ListAccounts> {
     return showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          contentPadding: const EdgeInsets.all(8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text(
-              'Cadastrar conta',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          content: SizedBox(
-            height: 160,
-            width: 160,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 30),
-                  child: TextFormField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.list),
-                      hintText: 'Título da conta',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                    ),
-                  ),
-                ),
-                TextFormField(
-                  controller: dueDateController,
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.date_range),
-                    hintText: 'Data de vencimento',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  onTap: () async {
-                    DateTime? date = DateTime(1900);
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    date = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime(2100));
-
-                    dueDateController.text =
-                        utilsServices.formatDateTime(date!);
-                    print(dueDateController);
-                  },
-                )
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: const Text('Nao'),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-
-                final data = Account(
-                  title: titleController.text,
-                  dueDate: dueDateController.text,
-                  status: false,
-                );
-
-                accountsRepository.createData(data);
-              },
-              child: const Text('Sim'),
-            )
-          ],
+        return AlertDialogForm(
+          titleController: titleController,
+          dueDateController: dueDateController,
+          accountsRepository: accountsRepository,
         );
       },
     );
@@ -141,8 +57,10 @@ class _ListAccountsState extends State<ListAccounts> {
               itemCount: accounts.accounts.length,
               itemBuilder: (_, index) {
                 final c = accounts.accounts[index];
-                print('DATA:$c');
-                return AccountsTileWidget(account: c);
+                return AccountsTileWidget(
+                  account: c,
+                  accountsRepository: accounts,
+                );
               },
             ),
           ),

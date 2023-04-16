@@ -26,6 +26,7 @@ class AccountsRepository extends ChangeNotifier {
       data.length,
       (i) {
         return Account(
+          id: data[i]['id'],
           title: data[i]['title'],
           dueDate: data[i]['dueDate'],
           status: data[i]['status'] == 1,
@@ -52,5 +53,32 @@ class AccountsRepository extends ChangeNotifier {
     await db.execute("DROP TABLE IF EXISTS accounts");
     _getAccount();
     notifyListeners();
+  }
+
+  getItem(int? id) async {
+    final db = await DB.instance.database;
+    final info = await db.query('accounts', where: "id=?", whereArgs: [id]);
+    print(info);
+  }
+
+  updateItem(int? id, int? status) async {
+    final db = await DB.instance.database;
+
+    await db
+        .rawUpdate('UPDATE accounts SET status = ? WHERE id = ?', [status, id]);
+    notifyListeners();
+    _getAccount();
+  }
+
+  deleteItem(int? id) async {
+    final db = await DB.instance.database;
+
+    await db.delete(
+      'accounts',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    notifyListeners();
+    _getAccount();
   }
 }
