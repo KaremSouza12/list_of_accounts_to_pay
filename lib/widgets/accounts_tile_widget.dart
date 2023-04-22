@@ -46,7 +46,7 @@ class _AccountsTileWidgetState extends State<AccountsTileWidget> {
         subtitle: Text(widget.account.dueDate),
         trailing: SizedBox(
           width: 100,
-          child: _CheckPaymantWidget(
+          child: ActionButtomWidget(
             id: widget.account.id,
           ),
         ),
@@ -55,17 +55,18 @@ class _AccountsTileWidgetState extends State<AccountsTileWidget> {
   }
 }
 
-class _CheckPaymantWidget extends StatefulWidget {
-  const _CheckPaymantWidget({
+class ActionButtomWidget extends StatefulWidget {
+  const ActionButtomWidget({
+    super.key,
     required this.id,
   });
 
   final int? id;
   @override
-  State<_CheckPaymantWidget> createState() => __CheckPaymantWidgetState();
+  State<ActionButtomWidget> createState() => _ActionButtomWidgetState();
 }
 
-class __CheckPaymantWidgetState extends State<_CheckPaymantWidget> {
+class _ActionButtomWidgetState extends State<ActionButtomWidget> {
   late final id = widget.id;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController dueDateController = TextEditingController();
@@ -90,14 +91,11 @@ class __CheckPaymantWidgetState extends State<_CheckPaymantWidget> {
   Widget build(BuildContext context) {
     final accountListen = context.watch<AccountsRepository>();
     return Container(
-      width: 60,
+      width: 10,
       alignment: Alignment.bottomRight,
       decoration: BoxDecoration(
-        color: Colors.white,
+        // color: Colors.white,
         borderRadius: BorderRadius.circular(50),
-        boxShadow: [
-          BoxShadow(color: Colors.grey.shade300),
-        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -109,12 +107,13 @@ class __CheckPaymantWidgetState extends State<_CheckPaymantWidget> {
             },
             icon: const Icon(Icons.delete),
           ),
-          IconButton(
-              onPressed: () {
-                accountListen.getItem(id);
-                _showForm(context, accountListen);
-              },
-              icon: const Icon(Icons.update))
+          // IconButton(
+          //   onPressed: () {
+          //     accountListen.getItem(id);
+          //     _showForm(context, accountListen);
+          //   },
+          //   icon: const Icon(Icons.update),
+          // )
         ],
       ),
     );

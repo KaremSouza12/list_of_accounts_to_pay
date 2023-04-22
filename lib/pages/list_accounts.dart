@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pay_count/models/accounts.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
 import 'package:pay_count/service/utils_service.dart';
 import 'package:pay_count/widgets/accounts_tile_widget.dart';
@@ -7,9 +6,9 @@ import 'package:pay_count/widgets/alert_dialog_fome.dart';
 import 'package:provider/provider.dart';
 
 class ListAccounts extends StatefulWidget {
-  const ListAccounts({super.key, required this.title});
-
-  final String title;
+  const ListAccounts({
+    super.key,
+  });
 
   @override
   State<ListAccounts> createState() => _ListAccountsState();
@@ -46,8 +45,14 @@ class _ListAccountsState extends State<ListAccounts> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        centerTitle: true,
+        title: const Text(
+          'Contas a Pagar',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Column(
         children: [

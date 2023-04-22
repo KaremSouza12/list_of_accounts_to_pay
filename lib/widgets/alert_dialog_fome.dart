@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pay_count/models/accounts.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
 import 'package:pay_count/service/utils_service.dart';
@@ -23,9 +24,15 @@ class AlertDialogForm extends StatefulWidget {
 
 class _AlertDialogFormState extends State<AlertDialogForm> {
   final UtilsServices utilsServices = UtilsServices();
+  void cleaFiels() {
+    widget.titleController.text = '';
+    widget.dueDateController.text = '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: Colors.white,
       contentPadding: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -54,7 +61,11 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
                   prefixIcon: const Icon(Icons.list),
                   hintText: 'Título da conta',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(
+                      width: 3,
+                      color: Colors.indigo,
+                    ),
                   ),
                 ),
               ),
@@ -65,7 +76,11 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
                 prefixIcon: const Icon(Icons.date_range),
                 hintText: 'Data de vencimento',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: const BorderSide(
+                    width: 3,
+                    color: Colors.indigo,
+                  ),
                 ),
               ),
               onTap: () async {
@@ -99,17 +114,30 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
             textStyle: Theme.of(context).textTheme.labelLarge,
           ),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            if (widget.titleController.text == '' ||
+                widget.dueDateController.text == '') {
+              Fluttertoast.showToast(
+                  msg: "Preencha um dos campos",
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.TOP,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black38,
+                  textColor: Colors.white,
+                  fontSize: 16.0);
+            } else {
+              Navigator.of(context).pop(true);
 
-            final data = Account(
-              title: widget.titleController.text,
-              dueDate: widget.dueDateController.text,
-              status: false,
-            );
+              final data = Account(
+                title: widget.titleController.text,
+                dueDate: widget.dueDateController.text,
+                status: false,
+              );
 
-            widget.isUpdate == true
-                ? 'teste'
-                : widget.accountsRepository.createData(data);
+              widget.isUpdate == true
+                  ? 'teste'
+                  : widget.accountsRepository.createData(data);
+              cleaFiels();
+            }
           },
           child: const Text('Sim'),
         )

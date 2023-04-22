@@ -21,17 +21,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       theme: ThemeData(
+        primaryColor: Colors.indigo,
         colorScheme: ColorScheme.fromSeed(
-          primary: Colors.black,
-          seedColor: const Color.fromARGB(255, 10, 10, 10),
+          seedColor: Colors.indigo,
         ),
         useMaterial3: true,
       ),
-      home: const ListAccounts(
-        title: 'Lista de Contas a pagar',
-      ),
+      home: const ListAccounts(),
     );
   }
 }
