@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
 import 'package:pay_count/service/utils_service.dart';
 import 'package:pay_count/widgets/accounts_tile_widget.dart';
-import 'package:pay_count/widgets/alert_dialog_fome.dart';
+import 'package:pay_count/widgets/alert_dialog_form.dart';
 import 'package:provider/provider.dart';
 
 class ListAccounts extends StatefulWidget {
@@ -17,6 +17,7 @@ class ListAccounts extends StatefulWidget {
 class _ListAccountsState extends State<ListAccounts> {
   final TextEditingController titleController = TextEditingController();
   final TextEditingController dueDateController = TextEditingController();
+  final TextEditingController valueAccount = TextEditingController();
   final UtilsServices utilsServices = UtilsServices();
 
   @override
@@ -34,6 +35,7 @@ class _ListAccountsState extends State<ListAccounts> {
           titleController: titleController,
           dueDateController: dueDateController,
           accountsRepository: accountsRepository,
+          valueAccount: valueAccount,
         );
       },
     );

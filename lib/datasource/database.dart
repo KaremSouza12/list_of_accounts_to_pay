@@ -30,7 +30,7 @@ class DB {
   }
 
   String get _account =>
-      '''CREATE TABLE accounts (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, dueDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, status INTEGER NOT NULL)''';
+      '''CREATE TABLE account_pay (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title TEXT, dueDate TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, status INTEGER NOT NULL, valueAccount REAL )''';
 
   // static Future<void> insertAccounts(Account account) async {
   //   try {

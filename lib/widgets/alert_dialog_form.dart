@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:pay_count/models/accounts.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
 import 'package:pay_count/service/utils_service.dart';
@@ -10,13 +12,19 @@ class AlertDialogForm extends StatefulWidget {
     required this.titleController,
     required this.dueDateController,
     required this.accountsRepository,
+    required this.valueAccount,
     this.isUpdate = false,
+    this.idCount,
+    this.status,
   });
 
   final TextEditingController titleController;
   final TextEditingController dueDateController;
+  final TextEditingController valueAccount;
   final AccountsRepository accountsRepository;
   final bool? isUpdate;
+  final int? idCount;
+  final bool? status;
 
   @override
   State<AlertDialogForm> createState() => _AlertDialogFormState();
@@ -24,15 +32,10 @@ class AlertDialogForm extends StatefulWidget {
 
 class _AlertDialogFormState extends State<AlertDialogForm> {
   final UtilsServices utilsServices = UtilsServices();
-  void cleaFiels() {
-    widget.titleController.text = '';
-    widget.dueDateController.text = '';
-  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.white,
       contentPadding: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -49,8 +52,8 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
         ),
       ),
       content: SizedBox(
-        height: 160,
-        width: 160,
+        height: 270,
+        width: 250,
         child: Column(
           children: [
             Padding(
@@ -58,43 +61,68 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
               child: TextFormField(
                 controller: widget.titleController,
                 decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.list),
+                  prefixIcon: Icon(
+                    Icons.list,
+                    color: Colors.grey.shade500,
+                  ),
                   hintText: 'Título da conta',
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(
-                      width: 3,
-                      color: Colors.indigo,
-                    ),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
               ),
             ),
-            TextFormField(
-              controller: widget.dueDateController,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.date_range),
-                hintText: 'Data de vencimento',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: const BorderSide(
-                    width: 3,
-                    color: Colors.indigo,
+            Padding(
+              padding: const EdgeInsets.only(bottom: 30),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.date_range,
+                    color: Colors.grey.shade500,
+                  ),
+                  hintText: 'Valor da conta',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
+                controller: widget.valueAccount,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                ],
+                validator: (value) {
+                  if (value!.isEmpty) return 'Informe o valor do saldo';
+                  return null;
+                },
               ),
-              onTap: () async {
-                DateTime? date = DateTime(1900);
-                FocusScope.of(context).requestFocus(FocusNode());
-                date = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(1900),
-                    lastDate: DateTime(2100));
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: TextFormField(
+                controller: widget.dueDateController,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(
+                    Icons.date_range,
+                    color: Colors.grey.shade500,
+                  ),
+                  hintText: 'Data de vencimento',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                onTap: () async {
+                  DateTime? date = DateTime(1900);
+                  FocusScope.of(context).requestFocus(FocusNode());
+                  date = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(1900),
+                      lastDate: DateTime(2100));
 
-                widget.dueDateController.text =
-                    utilsServices.formatDateTime(date!);
-              },
+                  widget.dueDateController.text =
+                      utilsServices.formatDateTime(date!);
+                },
+              ),
             )
           ],
         ),
@@ -115,7 +143,8 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
           ),
           onPressed: () {
             if (widget.titleController.text == '' ||
-                widget.dueDateController.text == '') {
+                widget.dueDateController.text == '' ||
+                widget.valueAccount.text == '') {
               Fluttertoast.showToast(
                   msg: "Preencha um dos campos",
                   toastLength: Toast.LENGTH_SHORT,
@@ -131,12 +160,18 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
                 title: widget.titleController.text,
                 dueDate: widget.dueDateController.text,
                 status: false,
+                valueAccount: double.parse(widget.valueAccount.text),
               );
 
               widget.isUpdate == true
-                  ? 'teste'
+                  ? widget.accountsRepository.updateValues(
+                      widget.idCount,
+                      widget.titleController.text,
+                      widget.dueDateController.text,
+                      double.parse(widget.valueAccount.text),
+                      widget.status,
+                    )
                   : widget.accountsRepository.createData(data);
-              cleaFiels();
             }
           },
           child: const Text('Sim'),

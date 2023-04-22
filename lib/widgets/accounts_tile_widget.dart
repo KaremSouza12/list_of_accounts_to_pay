@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pay_count/models/accounts.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
 import 'package:pay_count/service/utils_service.dart';
-import 'package:pay_count/widgets/alert_dialog_fome.dart';
+import 'package:pay_count/widgets/alert_dialog_form.dart';
 import 'package:provider/provider.dart';
 
 class AccountsTileWidget extends StatefulWidget {
@@ -37,13 +37,13 @@ class _AccountsTileWidgetState extends State<AccountsTileWidget> {
             setState(() {
               isChecked = value!;
               isChecked == true
-                  ? account.updateItem(widget.account.id, 1)
-                  : account.updateItem(widget.account.id, 0);
+                  ? account.updateStatus(widget.account.id, 1)
+                  : account.updateStatus(widget.account.id, 0);
             });
           },
         ),
-        title: Text(widget.account.title),
-        subtitle: Text(widget.account.dueDate),
+        title: Text(widget.account.title as String),
+        subtitle: Text(widget.account.dueDate as String),
         trailing: SizedBox(
           width: 100,
           child: ActionButtomWidget(
@@ -70,10 +70,14 @@ class _ActionButtomWidgetState extends State<ActionButtomWidget> {
   late final id = widget.id;
   final TextEditingController titleController = TextEditingController();
   final TextEditingController dueDateController = TextEditingController();
+  final TextEditingController valueAccount = TextEditingController();
   final UtilsServices utilsServices = UtilsServices();
 
   Future<void> _showForm(
-      BuildContext context, AccountsRepository accountsRepository) {
+    BuildContext context,
+    AccountsRepository accountsRepository,
+    bool? status,
+  ) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -82,6 +86,9 @@ class _ActionButtomWidgetState extends State<ActionButtomWidget> {
           dueDateController: dueDateController,
           accountsRepository: accountsRepository,
           isUpdate: true,
+          valueAccount: valueAccount,
+          idCount: id,
+          status: status,
         );
       },
     );
@@ -107,13 +114,17 @@ class _ActionButtomWidgetState extends State<ActionButtomWidget> {
             },
             icon: const Icon(Icons.delete),
           ),
-          // IconButton(
-          //   onPressed: () {
-          //     accountListen.getItem(id);
-          //     _showForm(context, accountListen);
-          //   },
-          //   icon: const Icon(Icons.update),
-          // )
+          IconButton(
+            onPressed: () async {
+              print(widget.id);
+              final data = await accountListen.getItem(id);
+              titleController.text = data.title;
+              dueDateController.text = data.dueDate;
+              valueAccount.text = data.valueAccount.toString();
+              _showForm(context, accountListen, data.status);
+            },
+            icon: const Icon(Icons.update),
+          )
         ],
       ),
     );

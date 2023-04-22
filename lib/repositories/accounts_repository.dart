@@ -20,8 +20,9 @@ class AccountsRepository extends ChangeNotifier {
   _getAccount() async {
     db = await DB.instance.database;
     final List<Map<String, dynamic>> data = await db.query(
-      'accounts',
+      'account_pay',
     );
+
     _accounts = List.generate(
       data.length,
       (i) {
@@ -30,6 +31,7 @@ class AccountsRepository extends ChangeNotifier {
           title: data[i]['title'],
           dueDate: data[i]['dueDate'],
           status: data[i]['status'] == 1,
+          valueAccount: data[i]['valueAccount'],
         );
       },
     );
@@ -38,34 +40,39 @@ class AccountsRepository extends ChangeNotifier {
 
   createData(Account account) async {
     db = await DB.instance.database;
-    final id = db.insert(
-      'accounts',
+
+    final id = await db.insert(
+      'account_pay',
       account.toMap(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
     _getAccount();
     notifyListeners();
-    return id;
+    return (id);
   }
 
   deleteAll() async {
     db = await DB.instance.database;
-    await db.execute("DROP TABLE IF EXISTS accounts");
+    await db.execute("DROP TABLE IF EXISTS account_pay");
     _getAccount();
     notifyListeners();
   }
 
   getItem(int? id) async {
     final db = await DB.instance.database;
-    final info = await db.query('accounts', where: "id=?", whereArgs: [id]);
-    print(info);
+    final info = await db.query('account_pay', where: "id=?", whereArgs: [id]);
+    if (info.isNotEmpty) {
+      return Account.fromMap(info.first);
+    }
+
+    return null;
   }
 
-  updateItem(int? id, int? status) async {
+  updateStatus(int? id, int? status) async {
     final db = await DB.instance.database;
 
-    await db
-        .rawUpdate('UPDATE accounts SET status = ? WHERE id = ?', [status, id]);
+    await db.rawUpdate(
+        'UPDATE account_pay SET status = ? WHERE id = ?', [status, id]);
     notifyListeners();
     _getAccount();
   }
@@ -74,10 +81,30 @@ class AccountsRepository extends ChangeNotifier {
     final db = await DB.instance.database;
 
     await db.delete(
-      'accounts',
+      'account_pay',
       where: 'id = ?',
       whereArgs: [id],
     );
+    notifyListeners();
+    _getAccount();
+  }
+
+  updateValues(
+    int? id,
+    String? title,
+    String? dueDate,
+    double? valueAccount,
+    bool? status,
+  ) async {
+    final db = await DB.instance.database;
+
+    final account = Account(
+        id: id,
+        title: title,
+        dueDate: dueDate,
+        status: status,
+        valueAccount: valueAccount);
+    db.update('account_pay', account.toMap(), where: 'id=?', whereArgs: [id]);
     notifyListeners();
     _getAccount();
   }
