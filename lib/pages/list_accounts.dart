@@ -28,7 +28,7 @@ class _ListAccountsState extends State<ListAccounts> {
 
   Future<void> _showForm(
       BuildContext context, AccountsRepository accountsRepository) {
-    return showDialog(
+    return showModalBottomSheet(
       context: context,
       builder: (context) {
         return AlertDialogForm(

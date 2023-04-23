@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:pay_count/models/accounts.dart';
 import 'package:pay_count/repositories/accounts_repository.dart';
 import 'package:pay_count/service/utils_service.dart';
@@ -27,7 +28,7 @@ class _AccountsTileWidgetState extends State<AccountsTileWidget> {
     final account = context.watch<AccountsRepository>();
     return Card(
       margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: ListTile(
         leading: Checkbox(
           activeColor: Colors.green,
@@ -42,7 +43,13 @@ class _AccountsTileWidgetState extends State<AccountsTileWidget> {
             });
           },
         ),
-        title: Text(widget.account.title as String),
+        title: Text(
+          widget.account.title as String,
+          style: TextStyle(
+            decoration:
+                isChecked ? TextDecoration.lineThrough : TextDecoration.none,
+          ),
+        ),
         subtitle: Text(widget.account.dueDate as String),
         trailing: SizedBox(
           width: 100,
@@ -78,7 +85,8 @@ class _ActionButtomWidgetState extends State<ActionButtomWidget> {
     AccountsRepository accountsRepository,
     bool? status,
   ) {
-    return showDialog(
+    return showModalBottomSheet(
+      isScrollControlled: true,
       context: context,
       builder: (context) {
         return AlertDialogForm(
@@ -100,31 +108,26 @@ class _ActionButtomWidgetState extends State<ActionButtomWidget> {
     return Container(
       width: 10,
       alignment: Alignment.bottomRight,
-      decoration: BoxDecoration(
-        // color: Colors.white,
-        borderRadius: BorderRadius.circular(50),
-      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(
-            onPressed: () {
-              accountListen.deleteItem(id);
-            },
-            icon: const Icon(Icons.delete),
-          ),
-          IconButton(
             onPressed: () async {
-              print(widget.id);
               final data = await accountListen.getItem(id);
               titleController.text = data.title;
               dueDateController.text = data.dueDate;
               valueAccount.text = data.valueAccount.toString();
               _showForm(context, accountListen, data.status);
             },
-            icon: const Icon(Icons.update),
-          )
+            icon: const Icon(Icons.more_vert),
+          ),
+          IconButton(
+            onPressed: () {
+              accountListen.deleteItem(id);
+            },
+            icon: const Icon(Icons.delete),
+          ),
         ],
       ),
     );

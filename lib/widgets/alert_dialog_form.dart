@@ -33,31 +33,51 @@ class AlertDialogForm extends StatefulWidget {
 class _AlertDialogFormState extends State<AlertDialogForm> {
   final UtilsServices utilsServices = UtilsServices();
 
+  void clearInputs() {
+    widget.titleController.text = '';
+    widget.dueDateController.text = '';
+    widget.valueAccount.text = '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      contentPadding: const EdgeInsets.all(8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      title: const Padding(
-        padding: EdgeInsets.all(8.0),
-        child: Text(
-          'Cadastrar conta',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      content: SizedBox(
-        height: 270,
-        width: 250,
+    return SizedBox(
+      height: 420,
+      width: 250,
+      child: SingleChildScrollView(
         child: Column(
           children: [
+            Stack(
+              children: [
+                const SizedBox(
+                  width: double.infinity,
+                  height: 56.0,
+                  child: Center(
+                      child: Text(
+                    'Adicionar conta',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: AutofillHints.addressState,
+                    ),
+                  ) // Your desired title
+                      ),
+                ),
+                Positioned(
+                  left: 330.0,
+                  top: 8.0,
+                  child: IconButton(
+                    icon: const Icon(Icons.close), // Your desired icon
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                )
+              ],
+            ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 30),
+              padding: const EdgeInsets.fromLTRB(15, 30, 30, 10),
               child: TextFormField(
                 controller: widget.titleController,
                 decoration: InputDecoration(
@@ -73,7 +93,7 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 30),
+              padding: const EdgeInsets.fromLTRB(15, 10, 30, 10),
               child: TextFormField(
                 decoration: InputDecoration(
                   prefixIcon: Icon(
@@ -97,7 +117,7 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.fromLTRB(15, 10, 30, 10),
               child: TextFormField(
                 controller: widget.dueDateController,
                 decoration: InputDecoration(
@@ -123,60 +143,91 @@ class _AlertDialogFormState extends State<AlertDialogForm> {
                       utilsServices.formatDateTime(date!);
                 },
               ),
-            )
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: 20,
+                  right: 20,
+                  left: 20,
+                  bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 130,
+                    height: 40,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      child: const Text(
+                        'Não',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  SizedBox(
+                    width: 130,
+                    child: ElevatedButton(
+                      style: TextButton.styleFrom(
+                        textStyle: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      onPressed: () {
+                        if (widget.titleController.text == '' ||
+                            widget.dueDateController.text == '' ||
+                            widget.valueAccount.text == '') {
+                          Fluttertoast.showToast(
+                              msg: "Preencha um dos campos",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.TOP,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.black38,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        } else {
+                          final data = Account(
+                            title: widget.titleController.text,
+                            dueDate: widget.dueDateController.text,
+                            status: false,
+                            valueAccount:
+                                double.parse(widget.valueAccount.text),
+                          );
+
+                          widget.isUpdate == true
+                              ? widget.accountsRepository.updateValues(
+                                  widget.idCount,
+                                  widget.titleController.text,
+                                  widget.dueDateController.text,
+                                  double.parse(widget.valueAccount.text),
+                                  widget.status,
+                                )
+                              : widget.accountsRepository.createData(data);
+                          clearInputs();
+                        }
+                      },
+                      child: const Text(
+                        'Sim',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          style: TextButton.styleFrom(
-            textStyle: Theme.of(context).textTheme.labelLarge,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop(false);
-          },
-          child: const Text('Nao'),
-        ),
-        TextButton(
-          style: TextButton.styleFrom(
-            textStyle: Theme.of(context).textTheme.labelLarge,
-          ),
-          onPressed: () {
-            if (widget.titleController.text == '' ||
-                widget.dueDateController.text == '' ||
-                widget.valueAccount.text == '') {
-              Fluttertoast.showToast(
-                  msg: "Preencha um dos campos",
-                  toastLength: Toast.LENGTH_SHORT,
-                  gravity: ToastGravity.TOP,
-                  timeInSecForIosWeb: 1,
-                  backgroundColor: Colors.black38,
-                  textColor: Colors.white,
-                  fontSize: 16.0);
-            } else {
-              Navigator.of(context).pop(true);
-
-              final data = Account(
-                title: widget.titleController.text,
-                dueDate: widget.dueDateController.text,
-                status: false,
-                valueAccount: double.parse(widget.valueAccount.text),
-              );
-
-              widget.isUpdate == true
-                  ? widget.accountsRepository.updateValues(
-                      widget.idCount,
-                      widget.titleController.text,
-                      widget.dueDateController.text,
-                      double.parse(widget.valueAccount.text),
-                      widget.status,
-                    )
-                  : widget.accountsRepository.createData(data);
-            }
-          },
-          child: const Text('Sim'),
-        )
-      ],
     );
   }
 }
